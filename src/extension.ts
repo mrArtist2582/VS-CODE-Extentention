@@ -19,26 +19,15 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage('Playing error sound...');
     });
 
-    // Monitor terminal tasks for failures
+    // Monitor only task failures (commands that return non-zero exit codes)
     const taskEndListener = vscode.tasks.onDidEndTaskProcess((event) => {
         if (event.exitCode !== 0 && !isPlaying) {
-            outputChannel.appendLine(`Task failed with exit code: ${event.exitCode}`);
+            outputChannel.appendLine(`Command failed with exit code: ${event.exitCode}`);
             playSound(context);
         }
     });
 
-    // Monitor terminal close with error status
-    const terminalCloseListener = vscode.window.onDidCloseTerminal((terminal) => {
-        if (terminal.exitStatus && terminal.exitStatus.code !== 0 && !isPlaying) {
-            outputChannel.appendLine(`Terminal closed with error code: ${terminal.exitStatus.code}`);
-            playSound(context);
-        }
-    });
-
-    // Monitor PowerShell history for errors
-    monitorPowerShellHistory(context);
-
-    // Monitor diagnostics (compilation errors)
+    // Monitor compilation errors only
     const diagnosticListener = vscode.languages.onDidChangeDiagnostics((event) => {
         event.uris.forEach(uri => {
             const diagnostics = vscode.languages.getDiagnostics(uri);
@@ -50,10 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
         });
     });
 
-    // Monitor npm log directory for errors
-    monitorNpmLogs(context);
-
-    context.subscriptions.push(disposable, taskEndListener, terminalCloseListener, diagnosticListener);
+    context.subscriptions.push(disposable, taskEndListener, diagnosticListener);
 }
 
 function createWavFile(context: vscode.ExtensionContext) {
@@ -95,69 +81,7 @@ function createWavFile(context: vscode.ExtensionContext) {
     }
 }
 
-function monitorPowerShellHistory(context: vscode.ExtensionContext) {
-    const os = require('os');
-    const psHistoryPath = path.join(os.homedir(), 'AppData', 'Roaming', 'Microsoft', 'Windows', 'PowerShell', 'PSReadLine', 'ConsoleHost_history.txt');
-    
-    outputChannel.appendLine(`Monitoring PowerShell history: ${psHistoryPath}`);
-    outputChannel.appendLine(`History file exists: ${fs.existsSync(psHistoryPath)}`);
-    
-    if (fs.existsSync(psHistoryPath)) {
-        let lastSize = fs.statSync(psHistoryPath).size;
-        outputChannel.appendLine(`Initial history file size: ${lastSize}`);
-        
-        setInterval(() => {
-            try {
-                const currentSize = fs.statSync(psHistoryPath).size;
-                if (currentSize > lastSize && !isPlaying) {
-                    const content = fs.readFileSync(psHistoryPath, 'utf8');
-                    const newContent = content.slice(lastSize);
-                    
-                    outputChannel.appendLine(`New PowerShell activity: ${newContent.trim()}`);
-                    
-                    // Simple approach: Play sound for ANY command that's not very common
-                    const command = newContent.trim().split(' ')[0].toLowerCase();
-                    const veryCommonCommands = ['cd', 'ls', 'dir', 'cls', 'pwd', 'exit', 'clear'];
-                    
-                    // If it's not a very common command, assume it might be an error
-                    const shouldPlaySound = !veryCommonCommands.includes(command) && command.length > 0;
-                    
-                    if (shouldPlaySound) {
-                        outputChannel.appendLine(`Potential error command detected: ${newContent.trim()}`);
-                        playSound(context);
-                    }
-                }
-                lastSize = currentSize;
-            } catch (error) {
-                outputChannel.appendLine(`History monitoring error: ${error}`);
-            }
-        }, 1000);
-    } else {
-        outputChannel.appendLine('PowerShell history file not found - terminal monitoring disabled');
-    }
-}
 
-function monitorNpmLogs(context: vscode.ExtensionContext) {
-    const os = require('os');
-    const npmLogDir = path.join(os.homedir(), 'AppData', 'Local', 'npm-cache', '_logs');
-    
-    if (fs.existsSync(npmLogDir)) {
-        fs.watch(npmLogDir, (eventType, filename) => {
-            if (eventType === 'rename' && filename && filename.includes('debug') && !isPlaying) {
-                setTimeout(() => {
-                    const logPath = path.join(npmLogDir, filename);
-                    if (fs.existsSync(logPath)) {
-                        const content = fs.readFileSync(logPath, 'utf8');
-                        if (content.includes('error') || content.includes('verbose exit 1')) {
-                            outputChannel.appendLine(`NPM error detected in: ${filename}`);
-                            playSound(context);
-                        }
-                    }
-                }, 100);
-            }
-        });
-    }
-}
 
 function playSound(context: vscode.ExtensionContext) {
     if (isPlaying) return;

@@ -2,8 +2,9 @@
   "name": "error-aavi",
   "displayName": "Error Aavi- By Gujju developers (CK)",
   "description": "Plays a custom sound alert when terminal output contains error keywords like 'error', 'failed', or 'exception'",
-  "version": "1.0.0",
-  "publisher": "CK DEVELOPERS",
+  "version": "1.0.1",
+  "publisher": "KCDevelopers",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -53,12 +54,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/error-aavi.git"
+    "url": "https://github.com/mrArtist2582/VS-CODE-Extentention.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/error-aavi/issues"
+    "url": "https://github.com/mrArtist2582/VS-CODE-Extentention/issues"
   },
-  "homepage": "https://github.com/your-username/error-aavi#readme",
+  "homepage": "https://github.com/mrArtist2582/VS-CODE-Extentention#readme",
   "license": "MIT",
   "dependencies": {
     "node-wav-player": "1.0.0"
