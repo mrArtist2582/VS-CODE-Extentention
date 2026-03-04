@@ -1,0 +1,66 @@
+{
+  "name": "error-aavi",
+  "displayName": "Error Aavi- By Gujju developers (CK)",
+  "description": "Plays a custom sound alert when terminal output contains error keywords like 'error', 'failed', or 'exception'",
+  "version": "1.0.0",
+  "publisher": "CK DEVELOPERS",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other",
+    "Debuggers"
+  ],
+  "keywords": [
+    "terminal",
+    "error",
+    "sound",
+    "alert",
+    "notification",
+    "audio"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "error-aavi.testSound",
+        "title": "Test Error Sound",
+        "category": "Error Aavi"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "1.93.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/error-aavi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/error-aavi/issues"
+  },
+  "homepage": "https://github.com/your-username/error-aavi#readme",
+  "license": "MIT",
+  "dependencies": {
+    "node-wav-player": "1.0.0"
+  }
+}
