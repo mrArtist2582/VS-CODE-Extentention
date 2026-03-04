@@ -2,7 +2,7 @@
   "name": "error-aavi",
   "displayName": "Error Aavi- By Gujju developers (CK)",
   "description": "Plays a custom sound alert when terminal output contains error keywords like 'error', 'failed', or 'exception'",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "KCDevelopers",
   "icon": "icon.png",
   "engines": {
